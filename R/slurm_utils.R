@@ -45,20 +45,10 @@ submit_slurm_job <- function(tmpdir) {
 
 # Submit dummy job with a dependency via srun to block R process
 wait_for_job <- function(slr_job) {
-    queued <- system(
-        paste('test -z "$(squeue -hn', slr_job$jobname, '2>/dev/null)"'),
-        ignore.stderr = TRUE)
-    if (queued) {
-        srun <- sprintf(paste('srun',
-            '--nodes=1',
-            '--time=0:1',
-            '--output=/dev/null',
-            '--quiet',
-            '--dependency=singleton',
-            '--job-name=%s',
-            'echo 0'),
-            slr_job$jobname)
-        system(srun)
-    }
+    srun_template <- readLines(system.file("templates/srun_sh.txt", package = "rslurm"))
+    srun_cmd=whisker::whisker.render(srun_template, 
+    	list(jobid = slr_job$jobid))
+    system(srun_cmd)
+
     return()
 }

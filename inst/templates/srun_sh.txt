@@ -1,0 +1,2 @@
+
+srun --partition=interactive --time=0:1 --output=/dev/null --quiet --dependency=afterany:{{{jobid}}} echo 0
